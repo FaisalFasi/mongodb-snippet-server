@@ -1,0 +1,24 @@
+### Get all snppets 
+Get http://localhost:9000/snippets
+
+### Create a snippet
+Get http://localhost:9000/snippets/XbNVRm38Jg
+
+### POST a new snippet
+POST http://localhost:9000/snippets
+content-type: application/json
+
+{
+    "content": "this is some test content"
+}
+
+### Delete a snippet
+DELETE  http://localhost:9000/snippets/DBCC2857
+
+### PUT/Update a snippet
+PUT  http://localhost:9000/snippets/DBCC2857
+content-type: application/json
+
+{
+    "content": "this is some test content"
+}
