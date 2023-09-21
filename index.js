@@ -9,6 +9,29 @@
 import express from "express";
 import { nanoid } from "nanoid";
 import cors from "cors";
+import dotenv from "dotenv";
+// Mongo DB ============================================
+
+import mongoose from "mongoose";
+
+dotenv.config(process.env.MONGO_URI);
+
+const conn = mongoose.createConnection(process.env.MONGO_URI);
+
+const SnippetSchema = new mongoose.Schema(
+  {
+    title: String,
+    content: String,
+    shortId: String,
+  },
+  { timestamps: true }
+);
+
+const Snippet = conn.model("snippet", SnippetSchema);
+
+// Snippet.find();
+
+// Express API  ============================================
 // app is an instance of express
 // why i make it const? because i don't want to change it
 // why i make instance of express? because i want to use express methods and properties
@@ -17,98 +40,71 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const db = [
-  {
-    id: "DBCC2857",
-    title: "untitled",
-    createdAt: Date.now(),
-    modifiedAt: Date.now(),
-    content: `ReferenceError: qwüdpkqwdkpokqwpdk is not defined
-      at file:///C:/Users/basic/projects/BEAM/mongodb-project/server/index.js:9:1
-      at ModuleJob.run (node:internal/modules/esm/module_job:197:25)
-      at async Promise.all (index 0)
-      at async ESMLoader.import (node:internal/modules/esm/loader:337:24)
-      at async loadESM (node:internal/process/esm_loader:88:5)
-      at async handleMainPromise (node:internal/modules/run_main:61:12)
-  [nodemon] app crashed - waiting for file changes before starting...`,
-  },
-  {
-    id: "6F79257C",
-    title: "untitled",
-    createdAt: Date.now(),
-    modifiedAt: Date.now(),
-    content: `console.log(3791827398d7qwe98d7wq9d)
-  
-  SyntaxError: Invalid or unexpected token
-  at ESMLoader.moduleStrategy (node:internal/modules/esm/translators:115:18)
-  at ESMLoader.moduleProvider (node:internal/modules/esm/loader:289:14)
-  at async link (node:internal/modules/esm/module_job:70:21)
-  [nodemon] app crashed - waiting for file changes before starting...
-  `,
-  },
-];
-
-app.get("/", (request, response) => {
-  response.send("request received at  /");
-});
-app.get("/snippets", (request, response) => {
-  console.log("request received at  /snippets");
-  response.send(db);
+app.get("/snippets", async (request, response) => {
+  const snips = await Snippet.find({});
+  response.send(snips);
 });
 
-app.get("/snippets/:id", (request, response) => {
-  const id = request.params.id;
-  const foundDocument = db.find((item) => item.id === id);
-  if (foundDocument) response.send(foundDocument);
-  else response.status(404).send("snippet not found");
+app.get("/snippets/:shortId", async (request, response) => {
+  const { shortId } = request.params;
+  const foundDocument = await Snippet.findOne({ shortId: shortId });
+
+  if (foundDocument) {
+    response.send(foundDocument);
+  } else {
+    response.status(404).send("snippet not found");
+  }
 });
 
-app.post("/snippets", (request, response) => {
+app.post("/snippets", async (request, response) => {
   // 1) get content
   // 2) save it in the db
   //   test with (postman or rest client)
-  console.log(request.body);
+
   const newDocument = {
-    id: nanoid(10),
+    shortId: nanoid(8),
     title: request.body.title,
     content: request.body.content,
-    createdAt: Date.now(),
-    modifiedAt: Date.now(),
   };
-  db.push(newDocument);
-  response.send(newDocument);
+  const createdSnippet = await Snippet.create(newDocument);
+  response.send(createdSnippet);
 });
 
-app.delete("/snippets/:id", (request, response) => {
-  const id = request.params.id;
-  const foundDocument = db.find((item) => item.id === id);
-  if (foundDocument) {
-    db.splice(db.indexOf(foundDocument), 1);
+app.delete("/snippets/:shortId", async (request, response) => {
+  const { shortId } = request.params;
+  // const foundDocument = await Snippet.findOne({ shortId: shortId });
+  const deletedSnippet = await Snippet.deleteOne({ shortId: shortId });
+
+  if (deletedSnippet.deletedCount > 0) {
     response.send("snippet deleted successfully");
-  } else response.status(404).send("snippet not found");
+  } else {
+    response.status(404).send("snippet not found");
+  }
 });
 
 //  PUT / Update a snippet
 
-app.put("/snippets/:id", (request, response) => {
-  const id = request.params.id;
+app.put("/snippets/:shortId", async (request, response) => {
+  const { shortId } = request.params;
 
-  //   found the document with the id
-  const foundDocument = db.find((item) => item.id === id);
+  const updatedSnippet = await Snippet.findOneAndUpdate(
+    {
+      shortId: shortId,
+    },
+    {
+      title: request.body.title,
+      content: request.body.content,
+    },
+    {
+      new: true,
+    }
+  );
 
-  if (foundDocument) {
-    // get the index i.e (id) of the document
-    const indexOfDoc = db.indexOf(foundDocument);
-    // update the content
-    db[indexOfDoc].content = request.body.content;
-    db[indexOfDoc].title = request.body.title;
-
-    db[indexOfDoc].createdAt = request.body.createdAt;
-    db[indexOfDoc].modifiedAt = request.body.modifiedAt;
-
-    // its a good practice to send the updated document back to the client not entire db
-    response.send(db[indexOfDoc]);
-  } else response.status(404).send("snippet not found");
+  if (updatedSnippet.isModified) {
+    response.send(updatedSnippet);
+  } else {
+    response.status(404).send("snippet not found");
+  }
 });
 
 app.listen(9000, () => {

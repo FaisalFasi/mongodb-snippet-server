@@ -2,7 +2,7 @@
 Get http://localhost:9000/snippets
 
 ### Create a snippet
-Get http://localhost:9000/snippets/XbNVRm38Jg
+Get http://localhost:9000/snippets/lalNWFxG
 
 ### POST a new snippet
 POST http://localhost:9000/snippets
@@ -17,10 +17,10 @@ content-type: application/json
 DELETE  http://localhost:9000/snippets/DBCC2857
 
 ### PUT/Update a snippet
-PUT  http://localhost:9000/snippets/DBCC2857
+PUT  http://localhost:9000/snippets/lalNWFxG
 content-type: application/json
 
 {
-    "title": "this is a new title",
+    "title": "this is a new title 2",
     "content": "this is some test content"
 }
