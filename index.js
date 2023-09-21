@@ -8,17 +8,21 @@
 // why we use express? because it's a framework that makes it easy to build web applications and APIs
 import express from "express";
 import { nanoid } from "nanoid";
-
+import cors from "cors";
 // app is an instance of express
 // why i make it const? because i don't want to change it
 // why i make instance of express? because i want to use express methods and properties
 const app = express();
 // why i use app.use ? because i want to use a middleware (a function that runs before the request is handled)
 app.use(express.json());
+app.use(cors());
 
 const db = [
   {
     id: "DBCC2857",
+    title: "untitled",
+    createdAt: Date.now(),
+    modifiedAt: Date.now(),
     content: `ReferenceError: qwüdpkqwdkpokqwpdk is not defined
       at file:///C:/Users/basic/projects/BEAM/mongodb-project/server/index.js:9:1
       at ModuleJob.run (node:internal/modules/esm/module_job:197:25)
@@ -30,6 +34,9 @@ const db = [
   },
   {
     id: "6F79257C",
+    title: "untitled",
+    createdAt: Date.now(),
+    modifiedAt: Date.now(),
     content: `console.log(3791827398d7qwe98d7wq9d)
   
   SyntaxError: Invalid or unexpected token
@@ -63,7 +70,10 @@ app.post("/snippets", (request, response) => {
   console.log(request.body);
   const newDocument = {
     id: nanoid(10),
+    title: request.body.title,
     content: request.body.content,
+    createdAt: Date.now(),
+    modifiedAt: Date.now(),
   };
   db.push(newDocument);
   response.send(newDocument);
@@ -91,6 +101,11 @@ app.put("/snippets/:id", (request, response) => {
     const indexOfDoc = db.indexOf(foundDocument);
     // update the content
     db[indexOfDoc].content = request.body.content;
+    db[indexOfDoc].title = request.body.title;
+
+    db[indexOfDoc].createdAt = request.body.createdAt;
+    db[indexOfDoc].modifiedAt = request.body.modifiedAt;
+
     // its a good practice to send the updated document back to the client not entire db
     response.send(db[indexOfDoc]);
   } else response.status(404).send("snippet not found");
