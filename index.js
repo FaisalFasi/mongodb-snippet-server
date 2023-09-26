@@ -99,12 +99,13 @@ app.put("/snippets/:shortId", async (request, response) => {
       new: true,
     }
   );
+  response.send(updatedSnippet);
 
-  if (updatedSnippet.isModified) {
-    response.send(updatedSnippet);
-  } else {
-    response.status(404).send("snippet not found");
-  }
+  // if (updatedSnippet.isModified) {
+  //   response.send(updatedSnippet);
+  // } else {
+  //   response.status(404).send("snippet not found");
+  // }
 });
 
 app.listen(9000, () => {
