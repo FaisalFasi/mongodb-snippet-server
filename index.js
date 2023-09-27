@@ -100,12 +100,6 @@ app.put("/snippets/:shortId", async (request, response) => {
     }
   );
   response.send(updatedSnippet);
-
-  // if (updatedSnippet.isModified) {
-  //   response.send(updatedSnippet);
-  // } else {
-  //   response.status(404).send("snippet not found");
-  // }
 });
 
 app.listen(9000, () => {
