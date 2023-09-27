@@ -102,7 +102,7 @@ app.put("/snippets/:shortId", async (request, response) => {
   response.send(updatedSnippet);
 });
 
-app.listen(9000, () => {
+app.listen(process.env.PORT, () => {
   console.log("server is running on port 9000");
 });
 
