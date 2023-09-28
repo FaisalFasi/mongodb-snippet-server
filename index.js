@@ -23,6 +23,7 @@ const SnippetSchema = new mongoose.Schema(
     title: String,
     content: String,
     shortId: String,
+    language: String,
   },
   { timestamps: true }
 );
@@ -65,6 +66,7 @@ app.post("/snippets", async (request, response) => {
     shortId: nanoid(8),
     title: request.body.title,
     content: request.body.content,
+    language: request.body.language || "plaintext",
   };
   const createdSnippet = await Snippet.create(newDocument);
   response.send(createdSnippet);
@@ -94,6 +96,7 @@ app.put("/snippets/:shortId", async (request, response) => {
     {
       title: request.body.title,
       content: request.body.content,
+      language: request.body.language || "plaintext",
     },
     {
       new: true,
