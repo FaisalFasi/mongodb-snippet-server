@@ -48,6 +48,7 @@ app.get("/snippets", async (request, response) => {
 
 app.get("/snippets/:shortId", async (request, response) => {
   const { shortId } = request.params;
+
   const foundDocument = await Snippet.findOne({ shortId: shortId });
 
   if (foundDocument) {
@@ -60,7 +61,7 @@ app.get("/snippets/:shortId", async (request, response) => {
 app.post("/snippets", async (request, response) => {
   // 1) get content
   // 2) save it in the db
-  //   test with (postman or rest client)
+  //  test with (postman or rest client)
 
   const newDocument = {
     shortId: nanoid(8),
@@ -68,7 +69,10 @@ app.post("/snippets", async (request, response) => {
     content: request.body.content,
     language: request.body.language || "plaintext",
   };
+  console.log("newDocument: " + newDocument);
   const createdSnippet = await Snippet.create(newDocument);
+  console.log("createdSnippet: " + createdSnippet);
+
   response.send(createdSnippet);
 });
 
@@ -89,6 +93,8 @@ app.delete("/snippets/:shortId", async (request, response) => {
 app.put("/snippets/:shortId", async (request, response) => {
   const { shortId } = request.params;
 
+  console.log("shortId: " + shortId);
+
   const updatedSnippet = await Snippet.findOneAndUpdate(
     {
       shortId: shortId,
@@ -102,6 +108,8 @@ app.put("/snippets/:shortId", async (request, response) => {
       new: true,
     }
   );
+  console.log("updatedSnippet: " + updatedSnippet);
+
   response.send(updatedSnippet);
 });
 
