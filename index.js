@@ -62,7 +62,7 @@ app.post("/snippets", async (request, response) => {
   // 1) get content
   // 2) save it in the db
   //  test with (postman or rest client)
-
+  console.log("nanoid: " + nanoid(8));
   const newDocument = {
     shortId: nanoid(8),
     title: request.body.title,
